@@ -11,12 +11,10 @@ class MyButton extends StatelessWidget {
       onTap: function,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Container(
-            color: Colors.brown.shade300,
-            child: button,
-          ),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          color: Colors.brown.shade300,
+          child: button,
         ),
       ),
     );

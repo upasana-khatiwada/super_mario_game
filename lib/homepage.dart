@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:super_mario_game/button.dart';
+import 'package:super_mario_game/jumpingmario.dart';
 import 'package:super_mario_game/mario.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,11 +15,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static double marioX = 0;
   static double marioY = 1;
+
+  // for jumping functions
   double time = 0;
   double height = 0;
   double initialHeight = marioY;
+  String direction = "right";
+  bool midrun = false; //to flip around the image
+  bool midjump = false; //is false at first because it is at floor at first
 
-   void preJump()
+  void preJump()
 // sets the initial height before jumping
   {
     time = 0;
@@ -26,20 +32,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   void jump() {
+    midjump = true; //because mario is jumping
     preJump();
     Timer.periodic(const Duration(milliseconds: 50), (timer) {
-        // quadratic equation to beat gravity
-        //used in fluppy bird
+      // quadratic equation to beat gravity
+      //used in fluppy bird
 
-
-         // every time you click jump it increases by 0.05
+      // every time you click jump it increases by 0.05
       time += 0.05;
       height = -4.9 * time * time + 5 * time;
       if (initialHeight - height > 1) {
+        //because mario is landed on ground
+        midjump = false;
         // rebuild the widget with new values
         setState(() {
           marioY = 1;
         });
+        timer
+            .cancel(); //to make jump evenly as it goes fast every second third click
       } else {
         setState(() {
           marioY = initialHeight - height;
@@ -48,18 +58,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void moveLeft(){
-setState(() {
-  marioX -= 0.02;
-});
+  void moveLeft() {
+    midrun = !midrun;
+
+    direction = "left";
+    setState(() {
+      marioX -= 0.02;
+    });
   }
 
   //Moving right function +=0.02
   // moving right is  positive
-  void moveRight(){
-setState(() {
-  marioX += 0.02;
-});
+  void moveRight() {
+    midrun = !midrun;
+    direction = "right";
+
+    setState(() {
+      marioX += 0.02;
+    });
   }
 
   @override
@@ -74,7 +90,14 @@ setState(() {
               color: Colors.blue,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 0),
-                child: const MyMario(),
+                child: midjump
+                    ? JumpingMario(
+                        direction: direction,
+                      )
+                    : MyMario(
+                        direction: direction,
+                        midrun: midrun,
+                      ),
               ),
             ),
           ),
