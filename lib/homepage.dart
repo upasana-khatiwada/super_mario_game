@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:super_mario_game/button.dart';
 import 'package:super_mario_game/jumpingmario.dart';
 import 'package:super_mario_game/mario.dart';
+import 'package:super_mario_game/mushrooms.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +16,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static double marioX = 0;
   static double marioY = 1;
-
+double shroomX = 0.5;
+  double shroomY = 1;
+  double marioSize = 50;
   // for jumping functions
   double time = 0;
   double height = 0;
@@ -23,6 +26,21 @@ class _HomePageState extends State<HomePage> {
   String direction = "right";
   bool midrun = false; //to flip around the image
   bool midjump = false; //is false at first because it is at floor at first
+
+  void ateMushrooms(){
+    if((marioX -shroomX).abs()<0.05 && (marioY-shroomY).abs()<0.05){
+      setState(() {
+        //if eaten move mushroom off the screen
+        shroomX = 2;
+        marioSize = 100;
+      });
+    }
+
+  }
+
+   // -1 is beginning of x-axis
+  //  0 is the middle of x-axis
+  //  1 is the end of x-axis
 
   void preJump()
 // sets the initial height before jumping
@@ -65,6 +83,7 @@ class _HomePageState extends State<HomePage> {
   // moving right is  positive
   void moveRight() {
     direction = "right";
+    ateMushrooms();
     Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (const MyButton().userIsHoldingButton() == true &&
           (marioX + 0.02) < 1) {
@@ -80,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
   void moveLeft() {
     direction = "left";
-
+    ateMushrooms();
     Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (const MyButton().userIsHoldingButton() == true &&
           (marioX - 0.02) > -1) {
@@ -111,13 +130,17 @@ class _HomePageState extends State<HomePage> {
                     child: midjump
                         ? JumpingMario(
                             direction: direction,
+                            size: marioSize,
                           )
                         : MyMario(
                             direction: direction,
                             midrun: midrun,
+                            size: marioSize,
                           ),
                   ),
                 ),
+                Container(alignment: Alignment(shroomX, shroomY),
+                child: const Mushrooms(),),
                 const Padding(
                   padding: EdgeInsets.only(top: 10.0),
                   child: Row(
