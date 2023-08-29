@@ -32,7 +32,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void jump() {
-    midjump = true; //because mario is jumping
+    //disables the double jump
+   if(midjump == false){
+     midjump = true; //because mario is jumping
     preJump();
     Timer.periodic(const Duration(milliseconds: 50), (timer) {
       // quadratic equation to beat gravity
@@ -56,25 +58,39 @@ class _HomePageState extends State<HomePage> {
         });
       }
     });
+   }
   }
 
-  void moveLeft() {
-    midrun = !midrun;
-
-    direction = "left";
-    setState(() {
-      marioX -= 0.02;
+  //Moving right  +=0.02
+  // moving right is  positive
+  void moveRight() {
+    direction = "right";
+    Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (const MyButton().userIsHoldingButton() == true &&
+          (marioX + 0.02) < 1) {
+        setState(() {
+          marioX += 0.02;
+          midrun = !midrun;
+        });
+      } else {
+        timer.cancel();
+      }
     });
   }
 
-  //Moving right function +=0.02
-  // moving right is  positive
-  void moveRight() {
-    midrun = !midrun;
-    direction = "right";
+  void moveLeft() {
+    direction = "left";
 
-    setState(() {
-      marioX += 0.02;
+    Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (const MyButton().userIsHoldingButton() == true &&
+          (marioX - 0.02) > -1) {
+        setState(() {
+          marioX -= 0.02;
+          midrun = !midrun;
+        });
+      } else {
+        timer.cancel();
+      }
     });
   }
 
@@ -85,20 +101,71 @@ class _HomePageState extends State<HomePage> {
         children: [
           Expanded(
             flex: 4,
-            child: Container(
-              alignment: Alignment(marioX, marioY),
-              color: Colors.blue,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 0),
-                child: midjump
-                    ? JumpingMario(
-                        direction: direction,
-                      )
-                    : MyMario(
-                        direction: direction,
-                        midrun: midrun,
+            child: Stack(
+              children: [
+                Container(
+                  alignment: Alignment(marioX, marioY),
+                  color: Colors.blue,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 0),
+                    child: midjump
+                        ? JumpingMario(
+                            direction: direction,
+                          )
+                        : MyMario(
+                            direction: direction,
+                            midrun: midrun,
+                          ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          Text("MARIO",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text("0000",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                        ],
                       ),
-              ),
+                      Column(
+                        children: [
+                          Text("WORLD",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text("1-1",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text("TIME",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text("9999",
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
           Expanded(
